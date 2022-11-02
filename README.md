@@ -61,7 +61,7 @@ ecobeehvacmode -m [heat|cool|auto|off|auxHeatOnly]
 You'll want to refresh your Ecobee token at least every 30 days, which you can do running `ecobeehvacmode -r`.
 
 ### Use OpenWeatherMap to change your mode
-This depends on getting an Open Weather Map API KEY, this requires the following environment variables:
+This depends on getting an [Open Weather Map API KEY](https://openweathermap.org/appid). Running it in this mode requires the following environment variables:
 - OWM_WEATHER_LOCATION
   Your weather location. Go to https://openweathermap.org/, do "Search City" and find the name that you wish to use.
 
