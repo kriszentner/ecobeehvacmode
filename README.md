@@ -68,3 +68,8 @@ This depends on getting an Open Weather Map API KEY, this requires the following
 
 - HEATPUMP_LOCKOUT_TEMP
   This is the temperature in C to stop using your heat pump (switch to auxHeatOnly)
+
+Once the above are set up, you can just run in `w` mode, set up via cron or your scheduler of choice.
+```bash
+ecobeehvacmode -w
+```
