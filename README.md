@@ -12,6 +12,8 @@ The Ecobee uses an unknown weather provider for their outside temperatures. Unfo
 
 I created a Go program that will, once you get initial authentication set up switch your heat pump or furnace. My main application is using this with homekit. I have an automation that queries my Eve Weather device, and then runs an ssh command to my Homebridge server on a Raspberry Pi where this Go app exists. 
 
+This app can also monitor Open Weather Map and switch your Ecobee to/from heat/aux when it detects your temperature threshold. You'll need to run this with something like cron. I'd recommend every 15 minutes considering API query limits, and how fast temperature is prone to change in general.
+
 ### Caveats
 If you decide to run this on Homebridge for Raspberry Pi like I did, note that it has a on older version of Go (1.15), which means you'll need to change a couple functions that use `io`. You're better off using the latest Go version from https://go.dev/dl/. The armv6l release is backwards compatible with armv7l.
 
