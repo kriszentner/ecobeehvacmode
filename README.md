@@ -1,6 +1,6 @@
 # ecobeehvacmode
 
-This is a simple Go program I created for a home automation project.
+This is a simple Go program I created for a home automation project. It helps programatically switch heat (heat pump) and aux (furnace) modes.
 
 ## Set up
 My HVAC system at home is a combination heat pump and furnace. My thermostat is an Ecobee.
