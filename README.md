@@ -6,7 +6,7 @@ This is a simple Go program I created for a home automation project.
 My HVAC system at home is a combination heat pump and furnace. My thermostat is an Ecobee.
 
 ## Problem
-The Ecobee uses an unknown weather provider for their outside temperatures. Unfortunately for many, that weather source can often 2-3 be degrees C off, and there's no way to customize where the weather comes from.
+The Ecobee uses an unknown weather provider for their outside temperatures. Unfortunately for many, that weather source can often be 2°C-3°C off, and there's no way to customize where the weather comes from (whether it's another weather source or a personal weather station).
 
 ## Solutions
 
