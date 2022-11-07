@@ -1,6 +1,6 @@
 # ecobeehvacmode
 
-This is a simple Go program I created for a home automation project. It helps programatically switch heat (heat pump) and aux (furnace) modes.
+This is a simple Go program I created for a home automation project. It helps programatically switch heat (heat pump) and aux (furnace or electric resistance heating coils ) modes.
 
 ## Set up
 My HVAC system at home is a combination heat pump and furnace. My thermostat is an Ecobee.
@@ -71,7 +71,7 @@ This depends on getting an [Open Weather Map API KEY](https://openweathermap.org
   Your API key from Open Weather Map
   
 - FURNACE_LOCKOUT_TEMP
-  This is the temperature in C to stop using your furnace (switch to "heat").
+  This is the temperature in C to stop using your backup heat (furnace or electric resistance heating coils) this will switch to "heat".
 
 - HEATPUMP_LOCKOUT_TEMP
   This is the temperature in C to stop using your heat pump (switch to auxHeatOnly)
