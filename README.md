@@ -82,3 +82,17 @@ Once the above are set up, you can just run in `w` mode, set up via cron or your
 ```bash
 ecobeehvacmode -w
 ```
+
+### Using this as a web API
+You can also put this into API mode
+```bash
+ecobeehvacmode -d -p 8081
+```
+I've also included an install.sh file which will install this as a systemd service that can run daemonized. Once you have this running on a system, you can change hvac modes by querying the service. Some examples:
+```bash
+curl http://<yourserver>/?hvacmode=auxHeatOnly"
+```
+or
+```bash
+curl http://<yourserver>/?hvacmode=heat"
+```
