@@ -15,13 +15,14 @@ I created a Go program that will, once you get initial authentication set up swi
 This app can also monitor Open Weather Map and switch your Ecobee to/from heat/aux when it detects your temperature threshold. You'll need to run this with something like cron. I'd recommend every 15 minutes considering API query limits, and how fast temperature is prone to change in general.
 
 ### Caveats
-If you decide to run this on Homebridge for Raspberry Pi like I did, note that it has a on older version of Go (1.15), which means you'll need to change a couple functions that use `io`. You're better off using the latest Go version from https://go.dev/dl/. The armv6l release is backwards compatible with armv7l.
 
-It's theoretically possible to do the Open Weather Map automation (`w` mode) via Home Assistant, but I wasn't able to get it to switch my Ecobee to Aux mode.
+- **Home Assistant Swiching Ecobee to Aux is Broken** - It's theoretically possible to do the Open Weather Map automation (`w` mode) via Home Assistant, but I wasn't able to get it to switch my Ecobee to Aux mode. Once Home Assistant fixes the bug in being able to switch the Ecobee to Aux this app will be redundant.
 
-I also tried getting this working with Homekit initially, but for some reason, the trigger to run on temperature changes didn't seem to work, so I ended up switching to Home Assistant instead. I've designed this app with many methods of solving this problem, so let your creativity reign.
+- **Homekit Temperature Triggering Broken** - I also tried getting this working with Homekit initially, but for some reason, the trigger to run on temperature changes didn't seem to work, so I ended up switching to Home Assistant instead. I've designed this app with many methods of solving this problem, so let your creativity reign.
 
-You can get an Eve Weather to run on Home Assistant with a Thread network (likely with a Homepod as a master). It's a matter of unpairing it from the Homepod, having Homekit Controller automatically detecting it. From here you can have the Homekit integration in Home Assistant present the Eve Weather to the Homepod. Just select "sensors" as the only item to present.
+- **Pairing an Eve Weather with Home Assistant** - You can get an Eve Weather to run on Home Assistant with a Thread network (likely with a Homepod as a master). It's a matter of unpairing it from the Homepod, having Homekit Controller automatically detecting it. From here you can have the Homekit integration in Home Assistant present the Eve Weather to the Homepod. Just select "sensors" as the only item to present.
+
+- **Running this on Homebridge for Raspberry Pi** - If you decide to run this on Homebridge for Raspberry Pi like I did, note that it has a on older version of Go (1.15), which means you'll need to change a couple functions that use `io`. You're better off using the latest Go version from https://go.dev/dl/. The armv6l release is backwards compatible with armv7l.
 
 ## Initial authentication
 
