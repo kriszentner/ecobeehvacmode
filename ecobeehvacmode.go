@@ -11,8 +11,11 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/spf13/viper"
 
 	// Shortening the import reference name seems to make it a bit easier
 	owm "github.com/briandowns/openweathermap"
@@ -28,29 +31,25 @@ import (
 const tokenUri = "https://api.ecobee.com/token"
 const thermostatURI = "https://api.ecobee.com/1/thermostat?format=json"
 
-// These are set up as environment vars
-// Of course you can hardcode these as const or use vars, and compile them in with something like:
-// go build -X main.apiKey=abcdefghijklmnopqrstuvwxyzABCDEF
-
 // API Key from Ecobee
-var apiKey string = os.Getenv("API_KEY")
+var apiKey string = getConfValue("API_KEY", "")
 
 // Ecobee has a fairly consistent refreshtoken once it's set up. Set this below.
-var refreshTokenFile = os.Getenv("REFRESHTOKEN")
+var refreshTokenConst = getConfValue("REFRESHTOKEN", "")
 
 // File location for the refreshtoken. We'll keep track of it via file.
-var refreshTokenFile = os.Getenv("REFRESHTOKENFILE")
+var refreshTokenFile = getConfValue("REFRESHTOKENFILE", "/etc/ecobeehvacmode/refreshtoken")
 
 // Open Weather Map API Key
-var owmApiKey string = os.Getenv("OWM_API_KEY")
+var owmApiKey = getConfValue("OWM_API_KEY", "")
 
 // Open Weather Map location
-var weatherLocation = os.Getenv("OWM_WEATHER_LOCATION")
+var weatherLocation = getConfValue("OWM_WEATHER_LOCATION", "")
 
 // If running in w mode, when to lockout furnace vs heat pump
-var furnaceLockoutTempC = os.Getenv("FURNACE_LOCKOUT_TEMP")
+var furnaceLockoutTempC, _ = strconv.ParseFloat(getConfValue("FURNACE_LOCKOUT_TEMP", ""), 64)
 
-var heatpumpLockoutTempC = os.Getenv("HEATPUMP_LOCKOUT_TEMP")
+var heatpumpLockoutTempC, _ = strconv.ParseFloat(getConfValue("HEATPUMP_LOCKOUT_TEMP", ""), 64)
 
 type PinResponse struct {
 	EcobeePin string `json:"ecobeePin"`
@@ -225,12 +224,21 @@ func main() {
 	var hvacMode string
 	var refresh bool
 	var weather bool
+	var daemon bool
+	var port int
 	flag.StringVar(&hvacMode, "m", "", "hvac mode: heat, cool, auto, off, auxHeatOnly")
 	flag.BoolVar(&refresh, "r", false, "Refresh token only")
 	flag.BoolVar(&weather, "w", false, "Check and change hvacMode based on OpenWeatherMap")
+	flag.BoolVar(&daemon, "d", false, "Run as a web daemon")
+	flag.IntVar(&port, "p", 8081, "Web daemon port")
 	flag.Parse()
 
 	refreshToken := readRefreshToken()
+
+	if daemon {
+		webServer(port)
+		os.Exit(0)
+	}
 
 	if !refresh {
 		if !(hvacMode == "heat" || hvacMode == "cool" || hvacMode == "auto" || hvacMode == "off" || hvacMode == "auxHeatOnly") {
@@ -245,6 +253,25 @@ func main() {
 		renewAccessToken(refreshToken)
 	}
 	fmt.Println("done")
+}
+
+func getConfValue(key string, defaultValue string) string {
+	viper.SetConfigFile("/etc/ecobeehvacmode/ecobeehvacmode.conf")
+	viper.SetConfigType("env")
+	viper.ReadInConfig()
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			log.Print("Config file not found", err)
+			// Config file not found; ignore error if desired
+		} else {
+			log.Fatal("Unknown error: ", err)
+		}
+	}
+	value := viper.GetString(key)
+	if value != "" {
+		return value
+	}
+	return defaultValue
 }
 
 // Access: New tokens are good for 1 hour
@@ -438,4 +465,30 @@ func getTemp() float64 {
 	w.CurrentByName(weatherLocation)
 	fmt.Println(w.Main.Temp)
 	return w.Main.Temp
+}
+
+// Web server mode. Takes in a request like
+// http://127.0.0.1/?hvacmode=auxHeatOnly
+
+func webServer(port int) {
+	portString := fmt.Sprintf(":%d", port)
+
+	http.HandleFunc("/", httpHvacMode)
+
+	if err := http.ListenAndServe(portString, nil); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func httpHvacMode(w http.ResponseWriter, r *http.Request) {
+	refreshToken := readRefreshToken()
+	var hvacMode string
+	if r.URL.Query().Has("hvacmode") {
+		hvacMode = r.URL.Query().Get("hvacmode")
+		if hvacMode == "heat" || hvacMode == "cool" || hvacMode == "auto" || hvacMode == "off" || hvacMode == "auxHeatOnly" {
+			tokenResponse := renewAccessToken(refreshToken)
+			setHvacMode(tokenResponse.AccessToken, hvacMode)
+			io.WriteString(w, fmt.Sprintf("Set hvacMode to %s\n", hvacMode))
+		}
+	}
 }
