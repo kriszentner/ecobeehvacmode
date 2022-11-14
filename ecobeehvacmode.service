@@ -1,0 +1,14 @@
+[Unit]
+Description=Ecobeehvacmode service
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+User=daemon
+EnvironmentFile=/etc/default/ecobeehvacmode
+ExecStart=/usr/local/bin/ecobeehvacmode -d -p $ECOBEEHVACMODE_PORT
+
+[Install]
+WantedBy=multi-user.target
