@@ -10,7 +10,7 @@ The Ecobee uses an unknown weather provider for their outside temperatures. Unfo
 
 ## Solutions
 
-I created a Go program that will, once you get initial authentication set up switch your heat pump or furnace. My main application is using this with homekit. I have an automation that queries my Eve Weather device, and then runs an ssh command to my Homebridge server on a Raspberry Pi where this Go app exists. 
+I created a Go program that will, once you get initial authentication set up switch your heat pump or furnace. My main application is using this with home assistant. I have an automation that queries my Eve Weather device, and then makes an API call to the ecobeehvac mode API service running on my Homebridge server where this Go app exists.
 
 This app can also monitor Open Weather Map and switch your Ecobee to/from heat/aux when it detects your temperature threshold. You'll need to run this with something like cron. I'd recommend every 15 minutes considering API query limits, and how fast temperature is prone to change in general.
 
@@ -18,6 +18,10 @@ This app can also monitor Open Weather Map and switch your Ecobee to/from heat/a
 If you decide to run this on Homebridge for Raspberry Pi like I did, note that it has a on older version of Go (1.15), which means you'll need to change a couple functions that use `io`. You're better off using the latest Go version from https://go.dev/dl/. The armv6l release is backwards compatible with armv7l.
 
 It's theoretically possible to do the Open Weather Map automation (`w` mode) via Home Assistant, but I wasn't able to get it to switch my Ecobee to Aux mode.
+
+I also tried getting this working with Homekit initially, but for some reason, the trigger to run on temperature changes didn't seem to work, so I ended up switching to Home Assistant instead. I've designed this app with many methods of solving this problem, so let your creativity reign.
+
+You can get an Eve Weather to run on Home Assistant with a Thread network (likely with a Homepod as a master). It's a matter of unpairing it from the Homepod, having Homekit Controller automatically detecting it. From here you can have the Homekit integration in Home Assistant present the Eve Weather to the Homepod. Just select "sensors" as the only item to present.
 
 ## Initial authentication
 
